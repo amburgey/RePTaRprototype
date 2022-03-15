@@ -1,0 +1,25 @@
+
+model {
+
+  #Priors
+  #Intercept
+  b0 ~ dnorm(0,5)
+  #Covariate
+  for(c in 1:C){
+    b1[c] ~ dnorm(0,5)
+    b3[c] ~ dnorm(0,5)
+  }
+  b2 ~ dnorm(0,5)
+  for(j in 1:N){
+    #Random effect - ID
+    eta[j] ~ dnorm(0, tau_p)
+  }
+  #Hyperprior random effect - ID
+  tau_p ~ dunif(0,4)
+
+  #Likelihood
+  for(i in 1:length(read)){
+    read[i] ~ dbern(p[i])
+    logit(p[i]) <- b0 + b1[cov1[i]] + b2*cov2[i] + b3[cov1[i]]*cov2[i] + eta[ID[i]]
+  }
+}

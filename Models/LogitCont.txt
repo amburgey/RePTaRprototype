@@ -1,0 +1,23 @@
+
+model {
+
+  #Priors
+  #Intercept
+  b0 ~ dnorm(0,5)
+  #Covariate
+  b1 ~ dnorm(0,5)
+  #Hyperprior random effect - ID
+  tau_p ~ dunif(0,4)
+  
+  for(j in 1:N){
+    #Random effect - ID
+    eta[j] ~ dnorm(0, tau_p)
+  }
+
+  #Likelihood
+  for(i in 1:length(read)){
+    read[i] ~ dbern(p[i])
+    logit(p[i]) <- b0 + b1*cov[i] + eta[ID[i]]
+    loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
+  }
+}
