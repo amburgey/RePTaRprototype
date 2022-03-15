@@ -141,7 +141,7 @@ model {
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
-",file = "LogitCat.txt")
+",file = "Models/LogitCat.txt")
 
 ########################################################
 
@@ -167,7 +167,7 @@ inits <- function() {
   list()
 }
 
-out <- jagsUI::jags(model.file ="LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
@@ -195,7 +195,7 @@ model {
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
-",file = "LogitCat_noRE.txt")
+",file = "Models/LogitCat_noRE.txt")
 
 ########################################################
 
@@ -221,7 +221,7 @@ inits <- function() {
   list()
 }
 
-out <- jagsUI::jags(model.file ="LogitCat_noRE.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+out <- jagsUI::jags(model.file ="Models/LogitCat_noRE.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
@@ -254,7 +254,7 @@ model {
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
-",file = "LogitCont.txt")
+",file = "Models/LogitCont.txt")
 
 ########################################################
 
@@ -286,7 +286,7 @@ inits <- function() {
   list()
 }
 
-out <- jagsUI::jags(model.file ="LogitCont.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+out <- jagsUI::jags(model.file ="Models/LogitCont.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
@@ -316,7 +316,7 @@ model {
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
-",file = "LogitCatCon_noRE.txt")
+",file = "Models/LogitCatCon_noRE.txt")
 
 ########################################################
 
@@ -343,7 +343,7 @@ inits <- function() {
   list()
 }
 
-out <- jagsUI::jags(model.file ="LogitCatCon_noRE.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+out <- jagsUI::jags(model.file ="Models/LogitCatCon_noRE.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
@@ -378,7 +378,7 @@ model {
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
-",file = "LogitCatCat.txt")
+",file = "Models/LogitCatCat.txt")
 
 ########################################################
 
@@ -401,9 +401,7 @@ inits <- function() {
   list()
 }
 
-out <- jagsUI::jags(model.file ="LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
-
-out <- runjags::run.jags(model ="LogitCatCat.txt", data, monitor = parameters, n.chains=nc, sample=ni, burnin=nb, thin=nthin, method = "parallel")
+out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
