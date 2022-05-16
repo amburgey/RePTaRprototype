@@ -6,7 +6,7 @@ model {
   b0 ~ dnorm(0,5)
   #Covariate
   for(c in 1:C){
-    b1[c] ~ dnorm(0,5)
+    b1[c] ~ dnorm(0,5)      # e.g., Female, male
   }
   for(j in 1:N){
     #Random effect - ID

@@ -6,10 +6,11 @@ model {
   b0 ~ dnorm(0,5)
   #Covariate
   for(c in 1:C){
-    b1[c] ~ dnorm(0,5)     # e.g., Female, male
+    b1[c] ~ dnorm(0,5)  # Female, male
+    b3[c] ~ dnorm(0,5)  # Anterior, posterior
   }
   for(d in 1:D){
-    b2[d] ~ dnorm(0,5)  # e.g., Distance (0,0.5,1.0,1.5,2.0)
+    b2[d] ~ dnorm(0,5)  # Distance (0,0.5,1.0,1.5,2.0)
   }
   for(j in 1:N){
     #Random effect - ID
@@ -21,7 +22,7 @@ model {
   #Likelihood
   for(i in 1:length(read)){
     read[i] ~ dbern(p[i])
-    logit(p[i]) <- b0 + b1[cov1[i]] + b2[cov2[i]] + eta[ID[i]]
+    logit(p[i]) <- b0 + b1[Sex[i]] + b2[Dist[i]] + b3[Loc[i]] + eta[ID[i]]
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
