@@ -1,10 +1,11 @@
 library(tidyverse);library(dplyr);library(lubridate);library(lme4);library(performance);library(see);library(ggplot2);library(LaCroixColoR);library(patchwork);library(ordinal)
 
 ## Read in detailed behavioral trial info
-alldat <- read_csv("Data/RePTaR_trials_Aug2021_AllData.csv",show_col_types = FALSE) %>%
+alldat <- read_csv("Data/RePTaR_trials_Aug2021_AllData_2.csv",show_col_types = FALSE) %>%
   mutate(PITTAG = as.character(PITTAG)) %>%
   drop_na(TimeSide) %>%
-  mutate(TimeSide2 = lubridate::hms(TimeSide)) %>%   ## warnings because some times are NA, ignore
+  filter(TimeSide != 1) %>%  #drop one instance where incorrect time entered (outside of range retained for analysis anyway)
+  mutate(TimeSide2 = lubridate::hms(TimeSide)) %>%
   mutate(Date = dmy(Date)) %>%
   # filter((TimeSide >= c("19:00:00") & TimeSide <= c("21:00:00")) |
   #          (TimeSide >= c("3:00:00") & TimeSide <= c("5:00:00")))
@@ -59,7 +60,7 @@ nscans <- inner_join(numscans,siz, by=c("TRIAL","PITTAG")) %>%
 
 
 
-#### CREATE PLOT OF SNAKE CHARACTERISTICS ----
+#### CREATE PLOTS OF SNAKE CHARACTERISTICS ----
 
 ## Panel one. Snake sizes.
 siz$ID <- c(1:nrow(siz))
@@ -147,7 +148,7 @@ plotScan1 <- ggplot(scansex, aes(y=x, x=Sex2, fill=as.factor(Sex2))) +
 ## Option Two. Count of scans by tail break
 scantail <- aggregate(nscans$n, by = list(Tail=nscans$TAILBREAK), FUN = sum)
 
-# Plot scans by snake sex
+# Plot scans by tail break
 scantail$Break <- c("Not broken","Broken")
 
 plotScan2 <- ggplot(scantail, aes(y=x, x=Break, fill=as.factor(Break))) +
@@ -156,11 +157,10 @@ plotScan2 <- ggplot(scantail, aes(y=x, x=Break, fill=as.factor(Break))) +
   guides(fill=guide_legend(title="Tail")) +
   ylab(c("Number of Scans")) + xlab(c("Tail")) +
   theme(panel.background = element_rect(fill = 'white', colour = 'darkgrey'), legend.position = NULL)
-plotScan2
 
 
 
-# Get count of scans by food bulge
+## Option Three. Count of scans by food bulge
 scanbulge <- aggregate(nscans$n, by = list(Tail=nscans$BULGE), FUN = sum)
 
 # Plot scans by snake sex
@@ -172,40 +172,11 @@ plotScan2 <- ggplot(scanbulge, aes(y=x, x=Meal, fill=as.factor(Meal))) +
   guides(fill=guide_legend(title="Food bulge")) +
   ylab(c("Number of Scans")) + xlab(c("Food bulge")) +
   theme(panel.background = element_rect(fill = 'white', colour = 'darkgrey'), legend.position = NULL)
-plotScan2
 
 
 
-# Get count of scans by snake size
-scansize <- aggregate(nscans$n, by = list(Size=nscans$SVL), FUN = sum)
 
-# set up cut-off values 
-breaks <- c(634,727,820,913,1006,1099,1192,1285,1378,1434)
-# specify interval/bin labels
-tags <- c("[634-727)", "[727-820)", "[820-913)", "[913-1006)", "[1006-1099)","[1099-1192)", "[1192-1285)","[1285-1378)", "[1378-1434)")
-# bucketing values into bins
-group_size <- cut(scansize$Size, 
-                  breaks=breaks, 
-                  include.lowest=TRUE, 
-                  right=FALSE, 
-                  labels=tags)
-# inspect bins
-summary(group_size)
-
-# Plot scans by snake sex
-scanbulge$Meal <- c("Absent","Present")
-
-plotScan2 <- ggplot(scanbulge, aes(y=x, x=Meal, fill=as.factor(Meal))) +
-  geom_bar(position = "dodge", stat="identity") +
-  scale_fill_manual(values=c("#A6C4A3","#6CBEA8")) +
-  guides(fill=guide_legend(title="Food bulge")) +
-  ylab(c("Number of Scans")) + xlab(c("Food bulge")) +
-  theme(panel.background = element_rect(fill = 'white', colour = 'darkgrey'), legend.position = NULL)
-plotScan2
-
-
-
-#### DISTANCE SCANNED ----
+#### CREATE PLOTS OF DISTANCE SCANNED ----
 
 alldat2 <- subset(alldat, `Read (1/0)` == 1)
 alldat2 <- subset(alldat2, !is.na(`ApproxDist(in)`))
@@ -217,16 +188,15 @@ dscans$Sex2 <- ifelse(dscans$SEX == 0, "F", "M")
 
 # Not doing model selection because we're doing hypothesis testing: Distance ~ Sex + (1|ID)
 # Do ordered logistic regression because the distance value (e.g., 0, 0.5, 1, etc) mean something by the order they are in
-model.DIST <- clmm(`ApproxDist(in)` ~ SEX + (1|ID), data=dscans, Hess = TRUE)
-summary(model.DIST)
-
+# model.DIST <- clmm(`ApproxDist(in)` ~ SEX + (1|ID), data=dscans, Hess = TRUE)
+# summary(model.DIST)
 
 # set up cut-off values 
 breaks <- c(0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5)
 # specify interval/bin labels
 tags <- c("0", "0.5", "1", "1.5", "2","2.5", "3","3.5", "4","4.5")
 # bucketing values into bins
-group_dist <- cut(as.numeric(as.character(alldat$`ApproxDist(in)`)), 
+group_dist <- cut(as.numeric(as.character(alldat2$`ApproxDist(in)`)), 
                   breaks=breaks, 
                   include.lowest=TRUE, 
                   right=FALSE, 
@@ -239,8 +209,8 @@ plotDist <- ggplot(data = as_tibble(group_dist), aes(x=value)) +
   geom_bar(fill="#F7C69D") + 
   # scale_fill_manual(values = p) +
   # scale_color_manual(values = p) +
-  labs(x='Snake Size (mm)', y='Distance of Scan') +
-  theme(panel.background = element_blank(),axis.text = element_text(size=50),axis.title = element_text(size=55)) +
+  labs(x='Distance of Scans (in)', y='Number of Scans') +
+  theme(panel.background = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15)) +
   guides(fill = "none")
 
 
@@ -249,12 +219,20 @@ plotDist
 dev.off()
 
 
-plotDistSex <- ggplot(dscans, aes(x = as.factor(Sex2), y = NumDist, fill = Sex2)) +
-  geom_boxplot(size = .75) +
-  scale_fill_manual(values = c("#0B76AC","#172869")) +
-  xlab("Sex") + ylab("Distance Scanned (in)") +
-  theme(panel.background = element_blank(),axis.text = element_text(size=50), axis.title = element_text(size=55), legend.position = "none")
 
-png(file="ScanDistSex.png",width=7,height=7,units="in",res=600)
-plotDistSex
-dev.off()
+#### Qualitative description of scans and snake activity by trap and antenna ----
+scntrap <- table(alldat$Channel, alldat$`Read (1/0)`)
+scnant <- table(alldat$Channel, alldat$`Side (1/2)`, alldat$`Read (1/0)`)
+watch <- sum(alldat$WatchedMouse, na.rm = TRUE)/(nrow(subset(alldat, !is.na(WatchedMouse))))
+
+
+
+# plotDistSex <- ggplot(dscans, aes(x = as.factor(Sex2), y = NumDist, fill = Sex2)) +
+#   geom_boxplot(size = .75) +
+#   scale_fill_manual(values = c("#0B76AC","#172869")) +
+#   xlab("Sex") + ylab("Distance Scanned (in)") +
+#   theme(panel.background = element_blank(),axis.text = element_text(size=50), axis.title = element_text(size=55), legend.position = "none")
+# 
+# png(file="ScanDistSex.png",width=7,height=7,units="in",res=600)
+# plotDistSex
+# dev.off()
