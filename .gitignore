@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Uncombined datasets
+/Data/AaduCarltonStacifiles
+
+# Unused results files
+/Results/Unused
