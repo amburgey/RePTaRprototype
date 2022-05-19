@@ -1,6 +1,8 @@
 #### REMOTE PASSIVE INTEGRATED TRANSPONDER (PIT) TAG READER = RePTaR
 #### Brown treesnakes were PIT tagged and released into experimental trial arena to test the scanning success of this RePTaR reader prototype
-#### March 2022 - code written by Staci Amburgey
+#### Scanning success within a 2-in area around RePTaR antennas and distance from antenna gathered from videos of experimental trials
+#### Analysis done via logistic regression in a Bayesian framework with subsequent model comparison via WAIC
+#### Code written by Staci Amburgey
 #### Involving data collected from August 1-August 30 2021
 
 rm(list=ls())

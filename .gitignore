@@ -8,3 +8,6 @@
 
 # Unused results files
 /Results/Unused
+
+# Old data analysis using frequentist approach
+/Scripts/oldLogisticRegressionScanningSuccess.R
