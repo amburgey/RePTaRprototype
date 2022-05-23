@@ -1,4 +1,4 @@
-# RePTaRprototype
+# RePTaR Prototype
 
 We conceptualized, created, and trialed a prototype of a remote passive integrated transponder (PIT) tag reader (RePTaR) for use in obtaining individual identity scans of brown treesnakes (*Boiga irregularis*) on Gu&aring;han. We investigated if this setup could help remotely scan individuals in a laboratory setting with hopes of eventual use of RePTaR in the field to augment monitoring work being done in targeted study areas. Data came in 3 forms and from 3 sources: 1) scans (where snakes were successfully read by the reader) downloaded from RePTaR microSD cards, 2) scanning success (1 = scan, 0 = no scan) and trial information (e.g., approximated distance from antenna) from processed video recordings from each trial (while snakes could scan from farther away than 2 inches, we recorded failure to scan only within this 2-in area around all antennas), and 3) individual snake trait or tagging information from processing captured snakes. We used this information to run logistic regressions investigating what covariates could help describe variation in scanning success.
 
