@@ -70,8 +70,9 @@ plotTimes <- ggplot(dfsum, aes(x = Time, y = n, color = n, fill = n)) +
 #### DATA PREP FOR DETAILED BEHAVIORAL TRIAL AND SNAKE INFO.----
 
 ## Read in detailed behavioral trial info and format for plotting
-alldat <- read_csv("Data/RePTaR_trials_Aug2021_AllData_2.csv",show_col_types = FALSE) %>%
+alldat <- read_csv("Data/RePTaR_trials_AllData.csv",show_col_types = FALSE) %>%
   mutate(PITTAG = as.character(PITTAG)) %>%
+  mutate(PITTAG = str_match(PITTAG, "\"(.*?)\"")[,2]) %>% # remove quotations used to maintain full 15-digit ID (instead of scientific notation issues)
   drop_na(TimeSide) %>%                             # drop times when snake never scanned or didn't get close enough to the antenna to count as a scanning trial (<=2in)
   filter(TimeSide != 1) %>%                         # drop one instance where incorrect time entered (outside of time range retained for analysis anyway)
   mutate(TimeSide2 = lubridate::hms(TimeSide)) %>%  # specify as time
@@ -84,8 +85,9 @@ tags <- as.data.frame(unique(alldat$PITTAG)); colnames(tags) <- "PITTAG"
 tags$RFID <- substr(tags$PITTAG, 8, 15)
 
 ## Read in individual info and format for plotting
-siz <- read_csv("Data/SnakeSizes.csv",show_col_types = FALSE) %>%
+siz <- read_csv("Data/SnakeTraits.csv",show_col_types = FALSE) %>%
   select(DATETEST,TRIAL,PITTAG,SVL,TL,TAILBREAK,SEX,WEIGHT,BULGE,BATCHMARK,ARENASIDE) %>%  # subset to columns of interest
+  mutate(PITTAG = str_match(PITTAG, "\"(.*?)\"")[,2]) %>% # remove quotations used to maintain full 15-digit ID (instead of scientific notation issues)
   mutate_at(vars(PITTAG), factor) %>% 
   rename(Date = DATETEST) %>%                             # denote this day of trial as the date of interest
   mutate(Date = dmy(Date)) %>%                            # specify as date
@@ -193,7 +195,7 @@ alldat2 <- subset(alldat, `Read (1/0)` == 1)
 alldat2 <- subset(alldat2, !is.na(`ApproxDist(in)`))
 
 # Join scanning info per snake per trial with snake information
-dscans <- inner_join(alldat2[,c(5:7,14:15,18:19)],siz[,c(1:3,7,11:12)], by=c("Date","PITTAG"))
+dscans <- inner_join(alldat2,siz, by=c("Date","PITTAG"))
 dscans$`ApproxDist(in)` <- as.factor(dscans$`ApproxDist(in)`)
 dscans$NumDist <- as.numeric(as.character(droplevels(dscans$`ApproxDist(in)`)))
 # Convert 1/0 sex to F/M for plotting
@@ -228,9 +230,9 @@ plotDist <- ggplot(data = as_tibble(group_dist), aes(x=value)) +
 
 #### Qualitative description of scans and snake activity by trap and antenna.----
 # Scanning by RePTaR device (unit 1 or 2)
-scntrap <- table(alldat$Channel, alldat$`Read (1/0)`)
+scntrap <- table(alldat$ARENASIDE, alldat$`Read (1/0)`)
 # Scanning by RePTaR device (unit 1 or 2) and antenna (side 1 or 2)
-scnant <- table(alldat$Channel, alldat$`Side (1/2)`, alldat$`Read (1/0)`)
+scnant <- table(alldat$ARENASIDE, alldat$`Side (1/2)`, alldat$`Read (1/0)`)
 # Mouse watching by snakes
 watch <- sum(alldat$WatchedMouse, na.rm = TRUE)/(nrow(subset(alldat, !is.na(WatchedMouse))))
 
