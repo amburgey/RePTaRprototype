@@ -26,6 +26,8 @@ ggplot2_3.3.5
 
 LaCroixColoR_0.1.0
 
+jagsUI_1.5.2
+
 # Details of Article
 Details of this work can be found in the published journal article on this topic:
 
