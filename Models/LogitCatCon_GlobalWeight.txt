@@ -24,7 +24,7 @@ model {
   #Likelihood
   for(i in 1:length(read)){
     read[i] ~ dbern(p[i])
-    logit(p[i]) <- b0 + b1[Sex[i]] + b2[Dist[i]] + b3[Loc[i]] + b4*Weight[i] + b5[Loc[i]]*Size[i] + eta[ID[i]]
+    logit(p[i]) <- b0 + b1[Sex[i]] + b2[Dist[i]] + b3[Loc[i]] + b4*Weight[i] + b5[Loc[i]]*Weight[i] + eta[ID[i]]
     loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
   }
 }
