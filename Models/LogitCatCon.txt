@@ -8,7 +8,7 @@ model {
   for(c in 1:C){
     b1[c] ~ dnorm(0,5)     # e.g., Female, male
   }
-  b2 ~ dnorm(0,5)          # e.g., Size
+  b2 ~ dnorm(0,5)          # e.g., Weight
   for(j in 1:N){
     #Random effect - ID
     eta[j] ~ dnorm(0, tau_p)
