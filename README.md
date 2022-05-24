@@ -34,4 +34,4 @@ Details of this work can be found in the published journal article on this topic
 Amburgey SA, Prakash A, Yackel Adams AA, Siers S, Converse SJ (in prep) Development and evaluation of the remote PIT tag reader (RePTaR) for monitoring brown treesnakes. XXXX.
 
 # How to Use This Repository
-Start in Scripts to summarize, prepare, and plot data; Results and figures will save to other folders and can be viewed there
+Start by downloading Data from ScienceBase (text file details where to find this archive). Go to file in Scripts to summarize, prepare, and plot data; Results and figures will save to other folders and can be viewed there
