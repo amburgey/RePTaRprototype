@@ -3,8 +3,16 @@
 #### Code written by Staci Amburgey
 #### Involving data collected from August 1-August 30 2021
 
-rm(list = ls())
+# The purpose of this script is to create 3 manuscript figures:
+## 1) scanning frequency across 6pm to 6am trial
+## 2) Two-panel figure of trial snake snout vent length (SVL) and weight
+## 3) Figure of distance at which scanning occurred
 
+
+
+#clear workspace
+rm(list = ls())
+#load packages
 library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(ggplot2); library(LaCroixColoR)
 
 
@@ -13,11 +21,11 @@ library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(
 
 # Read in scanning data files as items in a list and then create a combined data frame. 
 # These are the files created by the RePTaR units that consist of records of when the snakes scan (so they do not contain failed scans).
-file_names1 <- dir("Data/Scans/Station_1-2021/Station_1/")
-data_frame1 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_1-2021/Station_1/",file_names1, sep=""),read.csv)))
-file_names2 <- dir("Data/Scans/Station_2-2021/Station_2/")
-data_frame2 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_2-2021/Station_2/",file_names2, sep=""),read.csv)))
-data_frame <- rbind(data_frame1,data_frame2)
+file_names1 <- dir("Data/Scans/Station_1-2021/Station_1/") #get file names station 1
+data_frame1 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_1-2021/Station_1/",file_names1, sep=""),read.csv)))#load data
+file_names2 <- dir("Data/Scans/Station_2-2021/Station_2/") #get file names station 2
+data_frame2 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_2-2021/Station_2/",file_names2, sep=""),read.csv)))#load data
+data_frame <- rbind(data_frame1,data_frame2)#combine station 1 & 2 data
 
 # Shape data into form for plotting
 df <- data_frame %>%
