@@ -149,7 +149,7 @@ data <- list(read=read, ID=ID, Sex=sex, Dist=as.integer(dist), Loc=loc, Weight=w
 modnam <- c("GlobalWeight")
 
 ## JAGS model details.----
-parameters<-c('b0','b1','b2','b3','b4','b5','loglike','eta',)
+parameters<-c('b0','b1','b2','b3','b4','b5','loglike','eta')
 
 inits <- function() {
   list()
