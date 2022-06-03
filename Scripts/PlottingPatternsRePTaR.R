@@ -60,10 +60,10 @@ plotTimes <- ggplot(dfsum, aes(x = Time, y = n, color = n, fill = n)) +
   scale_x_discrete(labels = labs) +
   theme(legend.position = "none", panel.background = element_rect(fill = "white", color = "darkgrey"), axis.title = element_text(size = 12), axis.text = element_text(size = 12))
 
-# Save plot to file
-# png(file="ScanCounts.png",width=8,height=5,units="in",res=600)
-# plotTimes
-# dev.off()
+## Save plot to file
+png(file="ScanCounts.png",width=8,height=5,units="in",res=600)
+plotTimes
+dev.off()
 
 
 
@@ -91,7 +91,7 @@ siz <- read_csv("Data/SnakeTraits.csv",show_col_types = FALSE) %>%
   mutate_at(vars(PITTAG), factor) %>% 
   rename(Date = DATETEST) %>%                             # denote this day of trial as the date of interest
   mutate(Date = dmy(Date)) %>%                            # specify as date
-  filter(PITTAG != 982091065198473) %>%                   # remove this tag as snake escaped when first trialed and there were no scans ever for this tag
+  filter(PITTAG != 982091065198473) %>%                   # remove this tag as snake escaped when first trialed before scanning and there were no scans ever for this tag
   filter(!(PITTAG == 982091065198381 & TRIAL == 10)) %>%  # remove individual who lost tag before trial (but there other, earlier trials with this tag)
   mutate(SEX = ifelse(SEX == "F", 1, 0))                  # specify sex as 1 (female), 0 (male)
 
@@ -180,10 +180,10 @@ plotSnake2 <- ggplot(data = as_tibble(group_wt), aes(x=value)) +
   theme(panel.background = element_blank(),axis.text = element_text(size=12, angle = 50, vjust = 0.5, hjust = 0.8), axis.ticks = element_blank(), axis.title = element_text(size=14)) +
   guides(fill = "none")
 
-# Save plot to file
-# png(file="Figures/SnakeInfo.png",width=7,height=7,units="in",res=600)
-# (plotSnake1 / plotSnake2)
-# dev.off()
+## Save plot to file
+png(file="Figures/SnakeInfo.png",width=7,height=7,units="in",res=600)
+(plotSnake1 / plotSnake2)
+dev.off()
 
 
 
@@ -221,10 +221,10 @@ plotDist <- ggplot(data = as_tibble(group_dist), aes(x=value)) +
   theme(panel.background = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15)) +
   guides(fill = "none")
 
-# Save plot to file
-# png(file="ScanDist.png",width=7,height=7,units="in",res=600)
-# plotDist
-# dev.off()
+## Save plot to file
+png(file="ScanDist.png",width=7,height=7,units="in",res=600)
+plotDist
+dev.off()
 
 
 
