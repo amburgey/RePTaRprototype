@@ -3,6 +3,12 @@
 #### Code written by Staci Amburgey
 #### Involving data collected from August 1-August 30 2021
 
+## The purpose of this script is to create 3 manuscript figures:
+## 1) scanning frequency across 6pm to 6am trial
+## 2) Two-panel figure of trial snake snout vent length (SVL) and weight
+## 3) Figure of distance at which scanning occurred
+
+
 rm(list = ls())
 
 library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(ggplot2); library(LaCroixColoR)
