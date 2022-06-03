@@ -41,7 +41,7 @@ siz <- read_csv("Data/SnakeTraits.csv",show_col_types = FALSE) %>%
   mutate_at(vars(PITTAG), factor) %>%
   rename(Date = DATETEST) %>%                             # denote this day of trial as the date of interest
   mutate(Date = dmy(Date)) %>%                            # specify as date
-  filter(PITTAG != 982091065198473) %>%                   # remove this tag as snake escaped when first trialed and there were no scans ever for this tag
+  filter(PITTAG != 982091065198473) %>%                   # remove this tag as snake escaped when first trialed before scanning and there were no scans ever for this tag
   filter(!(PITTAG == 982091065198381 & TRIAL == 10)) %>%  # remove individual who lost tag before trial (but there other, earlier trials with this tag)
   mutate(SEX = ifelse(SEX == "F", 1, 0)) %>%              # specify sex as 1 (female), 0 (male)
   mutate(TagLoc = ifelse(TRIAL < 15, 1, 0))               # trials 1-14 had tags in neck (1) while 15 and 16 had tags in posterior (0)
@@ -561,14 +561,37 @@ nthin = 1
 data <- list(read=read, ID=ID, cov1=sex, cov2=as.integer(dist), N=N, C=length(unique(loc)), D=length(unique(dist)))
 modnam <- c("SexDist")
 
+## JAGS model details.----
+parameters<-c('b0','b1','b2',"loglike",'eta')
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
+
 ## MODEL: Scan by Sex and Loc.----
-# data <- list(read=read, ID=ID, cov1=sex, cov2=loc, N=N, C=length(unique(sex)), D=length(unique(loc)))
-# modnam <- c("SexLoc")
+data <- list(read=read, ID=ID, cov1=sex, cov2=loc, N=N, C=length(unique(sex)), D=length(unique(loc)))
+modnam <- c("SexLoc")
+
+## JAGS model details.----
+parameters<-c('b0','b1','b2',"loglike",'eta')
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
 
 ## MODEL: Scan by Dist and Loc.----
-# data <- list(read=read, ID=ID, cov1=as.integer(dist), cov2=loc, N=N, C=length(unique(dist)), D=length(unique(loc)))
-# modnam <- c("DistLoc")
-
+data <- list(read=read, ID=ID, cov1=as.integer(dist), cov2=loc, N=N, C=length(unique(dist)), D=length(unique(loc)))
+modnam <- c("DistLoc")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
@@ -627,14 +650,37 @@ nthin = 1
 data <- list(read=read, ID=ID, cov1=sex, cov2=weight, N=N, C=length(unique(sex)))
 modnam <- c("SexWeight")
 
+## JAGS model details.----
+parameters<-c('b0','b1','b2',"loglike",'eta')
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCon.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
+
 ## MODEL: Scan by Dist and Weight.----
-# data <- list(read=read, ID=ID, cov1=as.integer(dist), cov2=weight, N=N, C=length(unique(dist)))
-# modnam <- c("DistWeight")
+data <- list(read=read, ID=ID, cov1=as.integer(dist), cov2=weight, N=N, C=length(unique(dist)))
+modnam <- c("DistWeight")
+
+## JAGS model details.----
+parameters<-c('b0','b1','b2',"loglike",'eta')
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCon.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
 
 ## MODEL: Scan by Loc and Weight.----
-# data <- list(read=read, ID=ID, cov1=loc, cov2=weight, N=N, C=length(unique(loc)))
-# modnam <- c("LocWeight")
-
+data <- list(read=read, ID=ID, cov1=loc, cov2=weight, N=N, C=length(unique(loc)))
+modnam <- c("LocWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
@@ -692,13 +738,37 @@ nthin = 1
 data <- list(read=read, ID=ID, cov=sex, N=N, C=length(unique(sex)))
 modnam <- c("Sex")
 
+## JAGS model details.----
+parameters<-c('b0','b1','loglike','eta') #'p',
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
+
 ## MODEL: Scan by Distance.----
-# data <- list(read=read, ID=ID, cov=as.integer(dist), N=N, C=length(unique(dist)))
-# modnam <- c("Dist")
+data <- list(read=read, ID=ID, cov=as.integer(dist), N=N, C=length(unique(dist)))
+modnam <- c("Dist")
+
+## JAGS model details.----
+parameters<-c('b0','b1','loglike','eta') #'p',
+
+inits <- function() {
+  list()
+}
+
+out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
 
 ## MODEL: Scan by Location.----
-# data <- list(read=read, ID=ID, cov=loc, N=N, C=length(unique(loc)))
-# modnam <- c("Loc")
+data <- list(read=read, ID=ID, cov=loc, N=N, C=length(unique(loc)))
+modnam <- c("Loc")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','loglike','eta') #'p',
