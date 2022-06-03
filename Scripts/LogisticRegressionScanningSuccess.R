@@ -5,13 +5,19 @@
 #### Code written by Staci Amburgey
 #### Involving data collected from August 1-August 30 2021
 
+## The purpose of this script is to:
+### 1) load and format data 
+### 2) fit models to data
+### 3) calculate WAIC for each model
+
+
 rm(list=ls())
 
 library(tidyverse); library(lubridate); library(dplyr); library(jagsUI); library(ggplot2)
 
 
 
-#### LOAD AND FORMAT BEHAVIORAL TRIAL DATA.----
+#### PART ONE: LOAD AND FORMAT BEHAVIORAL TRIAL DATA.----
 
 ## Read in detailed trial info and format for analysis
 alldat <- read_csv("Data/RePTaR_trials_AllData.csv",show_col_types = FALSE) %>%
@@ -78,7 +84,6 @@ ID <- as.vector(unlist(scan[,c("ID")]))             # ID of individuals
 sex <- as.vector(unlist(scan[,c("SEX")])) + 1       # sex of individuals
 trial <- as.vector(unlist(scan[,c("TRIAL")]))       # trial for each individual
 size <- as.vector(unlist(scan[,c("SVL")]))          # SVL for each individual; used for deciding if retaining SVL or weight but not used further in this script file as weight better supported
-dist <- as.vector(unlist(scan[,c("Dist")]))         # distance of individual from antenna
 dist <- as.vector(as.character(unlist(scan[,c("Dist")])))         # distance of individual from antenna
 dist <- ifelse(dist == 0, 1,                                      # convert each distance to a whole number for modeling and plotting ease
                ifelse(dist == 0.5, 2,
@@ -91,7 +96,17 @@ loc <- as.vector(unlist(scan[,c("TagLoc")])) + 1    # location of tag in snake
 
 
 
-#### LOGISTIC REGRESSION IN JAGS.----
+#### PART TWO: LOGISTIC REGRESSION IN JAGS.----
+
+# MCMC settings 
+nc = 3
+ni = 1000
+nb = 100
+nthin = 1
+
+inits <- function() {
+  list()
+}
 
 ########################################################
 
@@ -131,23 +146,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Global + Weight.----
 data <- list(read=read, ID=ID, Sex=sex, Dist=as.integer(dist), Loc=loc, Weight=weight, N=N, C=length(unique(sex)), D=length(unique(dist)))
 modnam <- c("GlobalWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','b4','b5','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_GlobalWeight.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -190,23 +194,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex, Loc, Weight, Loc*Weight.----
 data <- list(read=read, ID=ID, Sex=sex, Loc=loc, Weight=weight, N=N, C=length(unique(sex)))
 modnam <- c("SexLocWeightInt")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','b4','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_SexLocWeightInt.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -251,23 +244,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex, Dist, Loc, Weight.----
 data <- list(read=read, ID=ID, Sex=sex, Dist=as.integer(dist), Loc=loc, Weight=weight, N=N, C=length(unique(sex)), D=length(unique(dist)))
 modnam <- c("SexDistLocWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','b4','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_SexDistLocWeight.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -311,24 +293,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex, Dist, Loc.----
 data <- list(read=read, ID=ID, Sex=sex, Dist=as.integer(dist), Loc=loc, N=N, C=length(unique(sex)), D=length(unique(dist)))
 modnam <- c("SexDistLoc")
 
-
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_SexDistLoc.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -372,23 +342,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex, Dist, Weight.----
 data <- list(read=read, ID=ID, Sex=sex, Dist=as.integer(dist), Weight=weight, N=N, C=length(unique(sex)), D=length(unique(dist)))
 modnam <- c("SexDistWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_SexDistWeight.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -432,23 +391,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Dist, Loc, Weight.----
 data <- list(read=read, ID=ID, Loc=loc, Dist=as.integer(dist), Weight=weight, N=N, C=length(unique(sex)), D=length(unique(dist)))
 modnam <- c("DistLocWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2','b3','loglike','eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_DistLocWeight.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -490,24 +438,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Loc, Weight, and Loc*Weight.----
 data <- list(read=read, ID=ID, Loc=loc, Weight=weight, N=N, C=length(unique(loc)))
 modnam <- c("LocWeightInt")
 
-
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"b3","loglike",'eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon_LocWeightInt.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -550,23 +486,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex and Dist.----
 data <- list(read=read, ID=ID, cov1=sex, cov2=as.integer(dist), N=N, C=length(unique(loc)), D=length(unique(dist)))
 modnam <- c("SexDist")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -580,10 +505,6 @@ modnam <- c("SexLoc")
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
 
-inits <- function() {
-  list()
-}
-
 out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
@@ -595,10 +516,6 @@ modnam <- c("DistLoc")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -639,23 +556,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex and Weight.----
 data <- list(read=read, ID=ID, cov1=sex, cov2=weight, N=N, C=length(unique(sex)))
 modnam <- c("SexWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -669,10 +575,6 @@ modnam <- c("DistWeight")
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
 
-inits <- function() {
-  list()
-}
-
 out <- jagsUI::jags(model.file ="Models/LogitCatCon.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
 save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
@@ -684,10 +586,6 @@ modnam <- c("LocWeight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1','b2',"loglike",'eta')
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCatCon.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -727,23 +625,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan by Sex.----
 data <- list(read=read, ID=ID, cov=sex, N=N, C=length(unique(sex)))
 modnam <- c("Sex")
 
 ## JAGS model details.----
-parameters<-c('b0','b1','loglike','eta') #'p',
-
-inits <- function() {
-  list()
-}
+parameters<-c('b0','b1','loglike','eta')
 
 out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -755,11 +642,7 @@ data <- list(read=read, ID=ID, cov=as.integer(dist), N=N, C=length(unique(dist))
 modnam <- c("Dist")
 
 ## JAGS model details.----
-parameters<-c('b0','b1','loglike','eta') #'p',
-
-inits <- function() {
-  list()
-}
+parameters<-c('b0','b1','loglike','eta')
 
 out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -771,11 +654,7 @@ data <- list(read=read, ID=ID, cov=loc, N=N, C=length(unique(loc)))
 modnam <- c("Loc")
 
 ## JAGS model details.----
-parameters<-c('b0','b1','loglike','eta') #'p',
-
-inits <- function() {
-  list()
-}
+parameters<-c('b0','b1','loglike','eta')
 
 out <- jagsUI::jags(model.file ="Models/LogitCat.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -813,23 +692,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
-
 ## MODEL: Scan Weight.----
 data <- list(read=read, ID=ID, cov=weight, N=N)
 modnam <- c("Weight")
 
 ## JAGS model details.----
 parameters<-c('b0','b1',"loglike","eta")
-
-inits <- function() {
-  list()
-}
 
 out <- jagsUI::jags(model.file ="Models/LogitCont.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -865,22 +733,12 @@ model {
 
 ########################################################
 
-# MCMC settings 
-nc = 3
-ni = 1000
-nb = 100
-nthin = 1
-
 ## MODEL: Scan by Null.----
 data <- list(read=read, ID=ID, N=N)
 modnam <- c("Null")
 
 ## JAGS model details.----
-parameters<-c('b0',"loglike","eta") #p
-
-inits <- function() {
-  list()
-}
+parameters<-c('b0',"loglike","eta")
 
 out <- jagsUI::jags(model.file ="Models/LogitNull.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
 
@@ -889,7 +747,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 
 
-## MODEL COMPARISON.----
+## PART THREE: MODEL COMPARISON.----
 # Watanabe-Akaike Information Criterion (WAIC)
 
 ## Modified from https://github.com/heathergaya/JAGS-NIMBLE-Tutorials/blob/master/Known_Fate/Known_Fate_Models.Rmd
@@ -906,13 +764,16 @@ calc.waic <- function(x){
   return(WAIC)
 }
 
+#create matrix to hold WAIC
 waicALL2 <- matrix(NA, nrow=length(file_list), ncol=1, dimnames = list(sub("\\..*","",file_list),c("waic")))
 
+#calulcate WAIC
 for(i in 1:length(file_list)){
   load(file=paste("Results/",file_list[i],sep=""))   # will throw an error when it runs through all files and hits any subfolders in here - just make sure all results are in this central folder
   waicALL2[i,1] <- calc.waic(out)
 }
+#format WAIC matrix 
 waicALL3 <- as.data.frame(waicALL2[order(waicALL2),]); colnames(waicALL3) <- c("waic")
-waicALL3$deltawaic <- waicALL3$waic - min(waicALL3$waic, na.rm = TRUE)
+waicALL3$deltawaic <- waicALL3$waic - min(waicALL3$waic, na.rm = TRUE) # calculate deltaWAIC
 waicALL3$deltawaic <- round(waicALL3$deltawaic, 2)
 
