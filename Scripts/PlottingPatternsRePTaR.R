@@ -19,10 +19,8 @@ library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(
 
 # Read in scanning data files as items in a list and then create a combined data frame. 
 # These are the files created by the RePTaR units that consist of records of when the snakes scan (so they do not contain failed scans).
-file_names1 <- dir("Data/Scans/Station_1-2021/Station_1/")
-data_frame1 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_1-2021/Station_1/",file_names1, sep=""),read.csv)))
-file_names2 <- dir("Data/Scans/Station_2-2021/Station_2/")
-data_frame2 <- as_tibble(do.call(rbind,lapply(paste("Data/Scans/Station_2-2021/Station_2/",file_names2, sep=""),read.csv)))
+data_frame1 <- read_csv("Data/202185_829_stat1.csv")
+data_frame2 <- read_csv("Data/202185_829_stat2.csv")
 data_frame <- rbind(data_frame1,data_frame2)
 
 # Shape data into form for plotting
