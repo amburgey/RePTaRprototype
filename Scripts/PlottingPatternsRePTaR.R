@@ -194,14 +194,14 @@ dev.off()
 #### PLOT THREE: Figure of distance at which scanning occurred.----
 
 # Subset data to just where scanning occurred
-alldat2 <- subset(alldat, `Read (1/0)` == 1)
+alldat2 <- subset(alldat, Read == 1)
 # Subset to instances where snakes were visible and a distance could be estimated
-alldat2 <- subset(alldat2, !is.na(`ApproxDist(in)`))
+alldat2 <- subset(alldat2, !is.na(ApproxDist))
 
 # Join scanning info per snake per trial with snake information
 dscans <- inner_join(alldat2,siz, by=c("Date","PITTAG"))
-dscans$`ApproxDist(in)` <- as.factor(dscans$`ApproxDist(in)`)
-dscans$NumDist <- as.numeric(as.character(droplevels(dscans$`ApproxDist(in)`)))
+dscans$ApproxDist <- as.factor(dscans$ApproxDist)
+dscans$NumDist <- as.numeric(as.character(droplevels(dscans$ApproxDist)))
 # Convert 1/0 sex to F/M for plotting
 dscans$Sex2 <- ifelse(dscans$SEX == 0, "F", "M")
 
@@ -210,7 +210,7 @@ breaks <- c(0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5)
 # Specify interval/bin labels
 tags <- c("0", "0.5", "1", "1.5", "2","2.5", "3","3.5", "4","4.5")
 # Place values into bins
-group_dist <- cut(as.numeric(as.character(alldat2$`ApproxDist(in)`)), 
+group_dist <- cut(as.numeric(as.character(alldat2$ApproxDist)), 
                   breaks=breaks, 
                   include.lowest=TRUE, 
                   right=FALSE, 
@@ -234,9 +234,9 @@ dev.off()
 
 #### Qualitative description of scans and snake activity by trap and antenna.----
 # Scanning by RePTaR device (unit 1 or 2)
-scntrap <- table(alldat$ARENASIDE, alldat$`Read (1/0)`)
+scntrap <- table(alldat$ARENASIDE, alldat$Read)
 # Scanning by RePTaR device (unit 1 or 2) and antenna (side 1 or 2)
-scnant <- table(alldat$ARENASIDE, alldat$`Side (1/2)`, alldat$`Read (1/0)`)
+scnant <- table(alldat$ARENASIDE, alldat$Side, alldat$Read)
 # Mouse watching by snakes
 watch <- sum(alldat$WatchedMouse, na.rm = TRUE)/(nrow(subset(alldat, !is.na(WatchedMouse))))
 
@@ -257,7 +257,7 @@ plotScan1 <- ggplot(scansex, aes(y=x, x=Sex2, fill=as.factor(Sex2))) +
   theme(panel.background = element_rect(fill = 'white', colour = 'darkgrey'), legend.position = NULL)
 
 
-## Option. Count of scans by food bulge
+## Option. Count of scans by food bulge (upon capture, waited to test animals)
 scanbulge <- aggregate(nscans$n, by = list(Tail=nscans$BULGE), FUN = sum)
 # Add column of Absent or Present
 scanbulge$Meal <- c("Absent","Present")
