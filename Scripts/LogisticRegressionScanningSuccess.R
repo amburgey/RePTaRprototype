@@ -54,8 +54,8 @@ siz <- read_csv("Data/SnakeTraits.csv",show_col_types = FALSE) %>%
 siz$ID <- c(1:nrow(siz))                                  # denote individual ID
 
 ## Bind data to get scanning success by snake characteristics
-alldat2 <- subset(alldat, !is.na(`ApproxDist(in)`))  # remove instance where distance could not be approximated (e.g., snake blocked from view)
-dscan <- inner_join(alldat2[,c("Date","PITTAG","Read","TimeSide","ApproxDist(in)","Antenna2")],siz[,c("Date","TRIAL","PITTAG","SVL","SEX","WEIGHT","TagLoc","ID")], by=c("Date","PITTAG"))
+alldat2 <- subset(alldat, !is.na(ApproxDist))  # remove instance where distance could not be approximated (e.g., snake blocked from view)
+dscan <- inner_join(alldat2[,c("Date","PITTAG","Read","TimeSide","ApproxDist","Antenna2")],siz[,c("Date","TRIAL","PITTAG","SVL","SEX","WEIGHT","TagLoc","ID")], by=c("Date","PITTAG"))
 colnames(dscan) <- c("Date","PITTAG","Scan","TimeSide","Dist","Antenna","TRIAL","SVL","SEX","WEIGHT","TagLoc","ID")
 
 ## Limit analysis to scans within 2 inches as failure to scan was not recorded beyond this distance
