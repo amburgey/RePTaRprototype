@@ -29,7 +29,7 @@ alldat <- read_csv("Data/RePTaR_trials_AllData.csv",show_col_types = FALSE) %>%
   mutate(Date = dmy(Date)) %>%                       # specify as date
   filter((TimeSide2 >= c("19H 00M 00S") & TimeSide2 <= c("21H 00M 00S")) |       # limit to the subsetted trial times processed (7-9pm, 3-5am)
            (TimeSide2 >= c("03H 00M 00S") & TimeSide2 <= c("05H 00M 00S"))) %>%
-  mutate(Antenna = `Side (1/2)`) %>%                                             # rename for ease
+  mutate(Antenna = `Side`) %>%                                                     # rename for ease
   mutate(Antenna2 = if_else(Antenna == 1 & ARENASIDE == 1, 1,                      # rename antennas to be 1 & 2 (for unit 1) and 3 & 4 (for unit 2)
           if_else(Antenna == 2 & ARENASIDE == 1, 2,
                   if_else(Antenna == 1 & ARENASIDE == 2, 3,
@@ -55,7 +55,7 @@ siz$ID <- c(1:nrow(siz))                                  # denote individual ID
 
 ## Bind data to get scanning success by snake characteristics
 alldat2 <- subset(alldat, !is.na(`ApproxDist(in)`))  # remove instance where distance could not be approximated (e.g., snake blocked from view)
-dscan <- inner_join(alldat2[,c("Date","PITTAG","Read (1/0)","TimeSide","ApproxDist(in)","Antenna2")],siz[,c("Date","TRIAL","PITTAG","SVL","SEX","WEIGHT","TagLoc","ID")], by=c("Date","PITTAG"))
+dscan <- inner_join(alldat2[,c("Date","PITTAG","Read","TimeSide","ApproxDist(in)","Antenna2")],siz[,c("Date","TRIAL","PITTAG","SVL","SEX","WEIGHT","TagLoc","ID")], by=c("Date","PITTAG"))
 colnames(dscan) <- c("Date","PITTAG","Scan","TimeSide","Dist","Antenna","TRIAL","SVL","SEX","WEIGHT","TagLoc","ID")
 
 ## Limit analysis to scans within 2 inches as failure to scan was not recorded beyond this distance
