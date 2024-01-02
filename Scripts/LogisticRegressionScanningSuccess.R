@@ -209,7 +209,54 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL THREE: Scanning success by sex, dist, loc, weight with random effect of ID
+## MODEL THREE: Scanning success by sex, loc, weight with random effect of ID
+
+cat("
+model {
+
+  #Priors
+  #Intercept
+  b0 ~ dnorm(0,5)
+  #Covariate
+  for(c in 1:C){
+    b1[c] ~ dnorm(0,5)  # Female, male
+    b2[c] ~ dnorm(0,5)  # Anterior, posterior
+  }
+  b3 ~ dnorm(0,5)       # Weight
+  for(j in 1:N){
+    #Random effect - ID
+    eta[j] ~ dnorm(0, tau_p)
+  }
+  #Hyperprior random effect - ID
+  tau_p ~ dunif(0,4)
+
+  #Likelihood
+  for(i in 1:length(read)){
+    read[i] ~ dbern(p[i])
+    logit(p[i]) <- b0 + b1[Sex[i]] + b2[Loc[i]] + b3*Weight[i] + eta[ID[i]]
+    loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
+  }
+}
+",file = "Models/LogitCatCon_SexLocWeight.txt")
+
+########################################################
+
+## MODEL: Scan by Sex, Loc, Weight.----
+data <- list(read=read, ID=ID, Sex=sex, Loc=loc, Weight=weight, N=N, C=length(unique(sex)))
+modnam <- c("SexLocWeight")
+
+## JAGS model details.----
+parameters<-c('b0','b1','b2','b3','loglike','eta')
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCon_SexLocWeight.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
+
+
+########################################################
+
+## MODEL FOUR: Scanning success by sex, dist, loc, weight with random effect of ID
 
 cat("
 model {
@@ -259,7 +306,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL FOUR: Scanning success by sex, dist, loc with random effect of ID
+## MODEL FIVE: Scanning success by sex, dist, loc with random effect of ID
 
 cat("
 model {
@@ -308,7 +355,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL FIVE: Scanning success by sex, dist, weight with random effect of ID
+## MODEL SIX: Scanning success by sex, dist, weight with random effect of ID
 
 cat("
 model {
@@ -357,7 +404,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL SIX: Scanning success by dist, loc, weight with random effect of ID
+## MODEL SEVEN: Scanning success by dist, loc, weight with random effect of ID
 
 cat("
 model {
@@ -406,7 +453,57 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL SEVEN: Scanning success by loc, weight, loc*weight with random effect of ID 
+## MODEL EIGHT: Scanning success by dist, loc, weight, loc*weight with random effect of ID
+
+cat("
+model {
+
+  #Priors
+  #Intercept
+  b0 ~ dnorm(0,5)
+  #Covariate
+  for(c in 1:C){
+    b1[c] ~ dnorm(0,5)  # Anterior, posterior
+    b4[c] ~ dnorm(0,5)     # Anterior, posterior * Weight
+  }
+  for(d in 1:D){
+    b2[d] ~ dnorm(0,5)  # Distance (0,0.5,1.0,1.5,2.0)
+  }
+  b3 ~ dnorm(0,5)       # Weight
+  for(j in 1:N){
+    #Random effect - ID
+    eta[j] ~ dnorm(0, tau_p)
+  }
+  #Hyperprior random effect - ID
+  tau_p ~ dunif(0,4)
+
+  #Likelihood
+  for(i in 1:length(read)){
+    read[i] ~ dbern(p[i])
+    logit(p[i]) <- b0 + b1[Loc[i]] + b2[Dist[i]] + b3*Weight[i] + b4[Loc[i]]*Weight[i] + eta[ID[i]]
+    loglike[i] <- logdensity.bern(read[i],p[i])  # For WAIC
+  }
+}
+",file = "Models/LogitCatCon_DistLocWeightInt.txt")
+
+########################################################
+
+## MODEL: Scan by Dist, Loc, Weight.----
+data <- list(read=read, ID=ID, Loc=loc, Dist=as.integer(dist), Weight=weight, N=N, C=length(unique(sex)), D=length(unique(dist)))
+modnam <- c("DistLocWeightInt")
+
+## JAGS model details.----
+parameters<-c('b0','b1','b2','b3','b4','loglike','eta')
+
+out <- jagsUI::jags(model.file ="Models/LogitCatCon_DistLocWeightInt.txt", data, inits=inits, parameters.to.save = parameters, n.chains=nc, n.iter=ni, n.burnin=nb, n.thin=nthin, parallel = TRUE, n.cores = 3)
+
+save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
+
+
+
+########################################################
+
+## MODEL NINE: Scanning success by loc, weight, loc*weight with random effect of ID 
 
 cat("
 model {
@@ -453,7 +550,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL EIGHT, NINE, TEN: Scanning success by two categorical covariate (e.g., sex and dist, sex and loc, dist and loc) with random effect of ID 
+## MODEL TEN, ELEVEN, TWELVE: Scanning success by two categorical covariate (e.g., sex and dist, sex and loc, dist and loc) with random effect of ID 
 
 cat("
 model {
@@ -525,7 +622,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL ELEVEN, TWELVE, THIRTEEN: Scanning success by categorical covariate (e.g., sex or dist or loc) and continuous covariate (e.g., weight) with random effect of ID 
+## MODEL THIRTEEN, FOURTEEN, FIFTEEN: Scanning success by categorical covariate (e.g., sex or dist or loc) and continuous covariate (e.g., weight) with random effect of ID 
 
 cat("
 model {
@@ -595,7 +692,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL FOURTEEN, FIFTEEN, SIXTEEN: Scanning success by categorical covariate (e.g., sex) with random effect of ID 
+## MODEL SIXTEEN, SEVENTEEN, EIGHTEEN: Scanning success by categorical covariate (e.g., sex) with random effect of ID 
 
 cat("
 model {
@@ -664,7 +761,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL SEVENTEEN: Scanning success by continuous covariate (e.g., weight) with random effect of ID 
+## MODEL NINETEEN: Scanning success by continuous covariate (e.g., weight) with random effect of ID 
 
 cat("
 model {
@@ -707,7 +804,7 @@ save(out, file=paste("Results/ScanSuccess_",modnam,".Rdata",sep=""))
 
 ########################################################
 
-## MODEL EIGHTEEN: Scanning success null model (just individual random effect)
+## MODEL TWENTY: Scanning success null model (just individual random effect)
 
 cat("
 model {
