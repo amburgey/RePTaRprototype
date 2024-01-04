@@ -869,8 +869,12 @@ for(i in 1:length(file_list)){
   load(file=paste("Results/",file_list[i],sep=""))   # will throw an error when it runs through all files and hits any subfolders in here - just make sure all results are in this central folder
   waicALL2[i,1] <- calc.waic(out)
 }
-#format WAIC matrix 
+
+#format WAIC matrix
 waicALL3 <- as.data.frame(waicALL2[order(waicALL2),]); colnames(waicALL3) <- c("waic")
 waicALL3$deltawaic <- waicALL3$waic - min(waicALL3$waic, na.rm = TRUE) # calculate deltaWAIC
 waicALL3$deltawaic <- round(waicALL3$deltawaic, 2)
-
+#calculate WAIC weights
+waicALL3$rel_like <- exp(-.5*waicALL3$deltawaic)
+waicALL3$weight <- waicALL3$rel_like/sum(waicALL3$rel_like)
+waicALL3$weight <- round(waicALL3$weight, 2)
