@@ -48,24 +48,35 @@ dfsum <- df %>%
 
 #### PLOT ONE: Figure of scanning frequency across 6pm to 6am trial.----
 
-p <- lacroix_palette("Pamplemousse", n=20, type="continuous")
-p[1:20]
+# p <- lacroix_palette("Pamplemousse", n=20, type="continuous")
+# p[1:20]
 
-labs <- c("6pm","7pm","8pm","9pm","10pm","11pm","12am","1am","2am","3am","4am","5am","6am")
-# Specify which palette colors desired
-colsLC <- c("#F7AA14","#F6B90B","#F5C903","#F5D523","#F6DE5F","#E4E292","#89CE9F","#2DBAAC","#14A7B3","#0C95BA","#0A7AAF","#10518C","#172869")
-mid <- mean(dfsum$n) 
+#Labels in 24-hour time = "6pm","7pm","8pm","9pm","10pm","11pm","12am","1am","2am","3am","4am","5am","6am"
+labs <- c("18:00","19:00","20:00","21:00","22:00","23:00","24:00","01:00","02:00","03:00","04:00","05:00","06:00")
 
-plotTimes <- ggplot(dfsum, aes(x = Time, y = n, color = n, fill = n)) +
-  geom_bar(stat = "identity", alpha = 0.5) +
-  scale_fill_gradient2(midpoint=mid, low=colsLC[9], mid=colsLC[4], high=colsLC[1]) +
-  scale_color_gradient2(midpoint=mid, low=colsLC[9], mid=colsLC[4], high=colsLC[1]) +
+#Multi-color version of figure with peaks highlighted
+#Specify which palette colors desired
+# colsLC <- c("#F7AA14","#F6B90B","#F5C903","#F5D523","#F6DE5F","#E4E292","#89CE9F","#2DBAAC","#14A7B3","#0C95BA","#0A7AAF","#10518C","#172869")
+# mid <- mean(dfsum$n) 
+
+# plotTimes <- ggplot(dfsum, aes(x = Time, y = n, color = n, fill = n)) +
+#   geom_bar(stat = "identity", alpha = 0.5) +
+#   scale_fill_gradient2(midpoint=mid, low=colsLC[9], mid=colsLC[4], high=colsLC[1]) +
+#   scale_color_gradient2(midpoint=mid, low=colsLC[9], mid=colsLC[4], high=colsLC[1]) +
+#   ylab("Scan Count") +
+#   scale_x_discrete(labels = labs) +
+#   theme(legend.position = "none", panel.background = element_rect(fill = "white", color = "darkgrey"), axis.title = element_text(size = 12), axis.text = element_text(size = 12))
+
+#Single-color version of figure
+plotTimes <- ggplot(dfsum, aes(x = Time, y = n)) +
+  geom_bar(stat = "identity", fill = "#F6ABA2") +
   ylab("Scan Count") +
   scale_x_discrete(labels = labs) +
   theme(legend.position = "none", panel.background = element_rect(fill = "white", color = "darkgrey"), axis.title = element_text(size = 12), axis.text = element_text(size = 12))
 
+
 ## Save plot to file
-png(file="ScanCounts.png",width=8,height=5,units="in",res=600)
+png(file="Figures/ScanCounts_rev.png",width=8,height=5,units="in",res=600)
 plotTimes
 dev.off()
 
@@ -128,12 +139,6 @@ numscans <- scan_df %>%
 ## Join scanning info per snake per trial with snake information
 nscans <- inner_join(numscans,siz, by=c("TRIAL","PITTAG")) %>%
   add_column(ID = 1:nrow(numscans))
-
-## Use to determine colors available to use for plotting below (change n to get more or less colors)
-p <- lacroix_palette("Pamplemousse", n=9, type="continuous")
-p[1:9]
-colsLC <- c("#EA7580","#F19097","#F6ABA2","#F7C79D","#89C1A5","#18B0B0","#0C95BA","#0D659E","#172869")
-
 
 
 #### PLOT TWO: Two-panel figure of trial snake snout vent length (SVL) and weight.----
