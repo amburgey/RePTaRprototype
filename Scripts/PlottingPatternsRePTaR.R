@@ -207,8 +207,6 @@ alldat2 <- subset(alldat2, !is.na(ApproxDist))
 dscans <- inner_join(alldat2,siz, by=c("Date","PITTAG"))
 dscans$ApproxDist <- as.factor(dscans$ApproxDist)
 dscans$NumDist <- as.numeric(as.character(droplevels(dscans$ApproxDist)))
-# Convert 1/0 sex to F/M for plotting
-dscans$Sex2 <- ifelse(dscans$SEX == 0, "F", "M")
 
 # Set up cut-off values for scanning distance bins
 breaks <- c(0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5)
@@ -233,6 +231,41 @@ plotDist <- ggplot(data = as_tibble(group_dist), aes(x=value)) +
 ## Save plot to file
 png(file="ScanDist.png",width=7,height=7,units="in",res=600)
 plotDist
+dev.off()
+
+
+#### REVISED PLOT THREE: Figure of distance at which scanning and failure to scan occurred.----
+
+# Subset to instances where snakes were visible and a distance could be estimated
+alldat3 <- subset(alldat, !is.na(ApproxDist))
+
+# Join scanning info per snake per trial with snake information
+dscans2 <- inner_join(alldat3,siz, by=c("Date","PITTAG"))
+dscans2$ApproxDist <- as.factor(dscans2$ApproxDist)
+dscans2$NumDist <- as.numeric(as.character(droplevels(dscans2$ApproxDist)))
+
+# Set up cut-off values for scanning distance bins
+breaks <- c(0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5)
+# Format data for plotting
+all_dist <- dscans2 %>%
+  select(Read,ApproxDist) %>%
+  #Remove handful (9 records) of instances where someone recorded failure to scan past 2 inches - these were not recorded consistently and were retained for analysis as we expected most instances at these distances to result in failure to scan. We retain successful scans past 2 inches as we did not expect them to occur and are interesting to note.
+  filter(!(ApproxDist %in% c("2.5","3","3.5","4","4.5") & Read == "0")) %>%
+  mutate(Read = as.factor(Read)) %>%
+  mutate(ApproxDist = factor(ApproxDist, levels = breaks))
+
+plotDist2 <- ggplot(data = all_dist, aes(x=ApproxDist, group=Read)) + 
+  geom_bar(aes(fill=Read)) +
+  scale_fill_manual(values = c("#f4660f","#F7C69D"), breaks = c("0","1")) +
+  labs(x='Distance of Snake PIT tag (in)', y='Number of Instances') +
+  theme(panel.background = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15)) +
+  geom_vline(xintercept = 5.5, linetype="dashed", 
+             color = "black", size=1)
+  
+
+## Save plot to file
+png(file="ScanDist_Rev.png",width=7,height=7,units="in",res=600)
+plotDist2
 dev.off()
 
 
