@@ -11,7 +11,7 @@
 
 rm(list = ls())
 
-library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(ggplot2); library(LaCroixColoR)
+library(tidyr); library(dplyr); library(lubridate); library(tidyverse); library(ggplot2); library(LaCroixColoR); library(gridExtra)
 
 
 
@@ -165,8 +165,8 @@ mid <- mean(siz$SVL)
 plotSnake1 <- ggplot(data = as_tibble(group_size), aes(x=value)) + 
   geom_bar(fill="#18B0B0") + 
   labs(x='Snake SVL (mm)', y='Number of Snakes') +
-  theme(panel.background = element_blank(),axis.text = element_text(size=12, angle = 50, vjust = 0.5, hjust = 0.8), axis.ticks = element_blank(), axis.title = element_text(size=14)) +
-  guides(fill = "none")
+  theme(panel.background = element_rect(fill = "white", color = "darkgrey"),axis.text = element_text(size=12, angle = 50, vjust = 0.5, hjust = 0.9), axis.title = element_text(size=14)) +
+  guides(fill = "none") + ylim(0,50)
 
 ## Panel two. Snake weights.
 
@@ -186,12 +186,12 @@ summary(group_wt)
 plotSnake2 <- ggplot(data = as_tibble(group_wt), aes(x=value)) + 
   geom_bar(fill="#0C95BA") + 
   labs(x='Snake Weight (g)', y='Number of Snakes') +
-  theme(panel.background = element_blank(),axis.text = element_text(size=12, angle = 50, vjust = 0.5, hjust = 0.8), axis.ticks = element_blank(), axis.title = element_text(size=14)) +
-  guides(fill = "none")
+  theme(panel.background = element_rect(fill = "white", color = "darkgrey"),axis.text = element_text(size=12, angle = 50, vjust = 0.5, hjust = 0.9), axis.title = element_text(size=14)) +
+  guides(fill = "none") + ylim(0,100)
 
 ## Save plot to file
-png(file="Figures/SnakeInfo.png",width=7,height=7,units="in",res=600)
-(plotSnake1 / plotSnake2)
+png(file="Figures/SnakeInfo_Rev.png",width=7,height=7,units="in",res=600)
+grid.arrange(ncol = 1, nrow = 2, plotSnake1, plotSnake2)
 dev.off()
 
 
@@ -258,13 +258,14 @@ plotDist2 <- ggplot(data = all_dist, aes(x=ApproxDist, group=Read)) +
   geom_bar(aes(fill=Read)) +
   scale_fill_manual(values = c("#f4660f","#F7C69D"), breaks = c("0","1")) +
   labs(x='Distance of Snake PIT tag (in)', y='Number of Instances') +
-  theme(panel.background = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15)) +
+  theme(panel.background = element_rect(fill = "white", color = "darkgrey"),axis.text = element_text(size=12),axis.title = element_text(size=15)) +
   geom_vline(xintercept = 5.5, linetype="dashed", 
-             color = "black", size=1)
+             color = "black", size=1) +
+  scale_y_continuous(breaks=c(0,1500,3000,4500,6000,7500,9000),labels=c("0","1500","3000","4500","6000","7500","9000"), limits=c(0,9000))
   
 
 ## Save plot to file
-png(file="ScanDist_Rev.png",width=7,height=7,units="in",res=600)
+png(file="Figures/ScanDist_Rev.png",width=7,height=7,units="in",res=600)
 plotDist2
 dev.off()
 
